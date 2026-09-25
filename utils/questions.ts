@@ -272,7 +272,7 @@ export const questions: QuestionMap = {
     section: "Closing",
     text: "What's your rough monthly budget comfort level for tools/automation, if any?",
     type: "select",
-    options: ["N/A", "$0-$50", "$50-$150", "$150-$300", "$300+"],
+    options: ["N/A to my business", "$0-$50", "$50-$150", "$150-$300", "$300+"],
     required: false,
     next: "qC_3",
   },

@@ -5,51 +5,35 @@ export type AnswerMap = Record<string, string>;
 
 export type IntakeState = {
   answers: AnswerMap;
-  history: string[];
-  current: string;
+  sectionIndex: number;
   progress: number;
 
-  setCurrent: (id: string) => void;
+  setSectionIndex: (index: number) => void;
   addAnswer: (id: string, value: string) => void;
+  removeAnswer: (id: string) => void;
   setProgress: (percent: number) => void;
-
-  addToHistory: (id: string) => void;
-  goBack: () => void;
 };
 
-export const useIntakeStore = create<IntakeState>((set, get) => ({
+export const useIntakeStore = create<IntakeState>((set) => ({
   answers: {},
-  history: ["q0_1"],
-  current: "q0_1",
+  sectionIndex: 0,
   progress: 0,
 
-  addToHistory: (id) =>
-    set((state) => ({
-      history: [...state.history, id],
-    })),
-
-  goBack: () => {
-    const history = [...get().history];
-    if (history.length <= 1) return; // cannot go back from first question
-
-    history.pop(); // remove current
-    const previous = history[history.length - 1];
-
-    set({
-      current: previous,
-      history,
-    });
-  },
-
-  setCurrent: (id) => set({ current: id }),
+  setSectionIndex: (index) => set({ sectionIndex: index }),
 
   addAnswer: (id, value) =>
     set((state) => ({
       answers: { ...state.answers, [id]: value },
     })),
 
+  removeAnswer: (id) =>
+    set((state) => {
+      const answers = { ...state.answers };
+      delete answers[id];
+      return { answers };
+    }),
+
   setProgress: (percent) => set({ progress: percent }),
-  
 }));
 
 export function shouldSkipSection(section: string, answers: AnswerMap) {

@@ -7,7 +7,7 @@
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
   --radius: 10px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   --spacing: 1.25rem;
 }
 
@@ -46,6 +46,55 @@
   margin-bottom: var(--spacing);
 }
 
+.section-header {
+  margin-bottom: 2rem;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.6rem;
+}
+
+.section-count {
+  margin: 0 0 0.5rem;
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+.section-questions {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-question label {
+  display: block;
+}
+
+.form-question input,
+.form-question select {
+  margin-bottom: 0;
+}
+
+.answer-options,
+.section-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-navigation {
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* ---------- INPUTS ---------- */
 input[type="text"],
 select {
@@ -61,7 +110,7 @@ input:focus,
 select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
 /* ---------- BUTTONS ---------- */
@@ -80,10 +129,26 @@ select:focus {
   background: var(--primary-hover);
 }
 
+.answer-options .button.secondary {
+  background: transparent;
+  color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.answer-options .button.secondary:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+
 /* ---------- ANIMATIONS ---------- */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ---------- PROGRESS BAR ---------- */
