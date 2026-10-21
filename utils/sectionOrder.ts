@@ -1,4 +1,5 @@
 export const sectionOrder = [
+  "Business Basics",
   "Business Context",
   "Lead Capture & Intake",
   "Customer Communication & Nurture",

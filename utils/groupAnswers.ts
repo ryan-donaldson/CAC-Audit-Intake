@@ -4,6 +4,7 @@ import { QuestionSection } from "./questions";
 
 export function groupAnswersBySection(answers: AnswerMap) {
   const grouped: Record<QuestionSection, AnswerMap> = {
+    "Business Basics": {},
     "Business Context": {},
     "Lead Capture & Intake": {},
     "Customer Communication & Nurture": {},

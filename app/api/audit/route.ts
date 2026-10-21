@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
-  const body = await req.json();
+  let body: unknown;
 
-  console.log("Received audit:", body);
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { error: "The request body must contain valid JSON." },
+      { status: 400 },
+    );
+  }
 
-  // TODO: send to AI model, email service, database, etc.
+  // TODO: forward `body` to the Railway endpoint and return the generated PDF.
+  void body;
 
   return NextResponse.json({ ok: true });
 }

@@ -6,9 +6,10 @@ import { sectionOrder } from "../utils/sectionOrder";
 import FinalQuestion from "./questions/FinalQuestion";
 
 const conditionalQuestions: Record<string, string[]> = {
+  q0_5: ["q0_6"],
   q1_2: ["q1_2a"],
   q2_2: ["q2_2a"],
-  q3_1: ["q3_2", "q3_3"],
+  q3_1: ["q3_2", "q3_3", "q3_4"],
   q5_1: ["q5_1a"],
 };
 
@@ -17,12 +18,17 @@ function isQuestionVisible(
   answers: Record<string, string>,
 ) {
   switch (question.id) {
+    case "q0_6":
+      return (
+        answers.q0_5 === "Other businesses" || answers.q0_5 === "A mix of both"
+      );
     case "q1_2a":
       return answers.q1_2?.trim().toLowerCase() === "crm tool";
     case "q2_2a":
       return answers.q2_2 === "yes";
     case "q3_2":
     case "q3_3":
+    case "q3_4":
       return answers.q3_1 === "yes";
     case "q5_1a":
       return answers.q5_1 === "yes";
@@ -34,6 +40,9 @@ function isQuestionVisible(
 function isQuestionComplete(question: Question, answer: string | undefined) {
   if (question.required === false) return true;
   if (!answer?.trim()) return false;
+  if (question.type === "number") {
+    return Number.isFinite(Number(answer)) && Number(answer) >= 0;
+  }
   if (question.id === "qC_3") {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(answer);
   }
@@ -104,9 +113,22 @@ export default function QuestionRenderer() {
                 onChange={(event) => handleAnswer(question, event.target.value)}
                 placeholder={
                   question.id === "qC_3"
-                    ? "you@example.com"
+                    ? "email@example.com"
                     : "Type your answer..."
                 }
+                required={question.required !== false}
+              />
+            )}
+
+            {question.type === "number" && (
+              <input
+                id={question.id}
+                type="number"
+                min="0"
+                step="any"
+                value={answers[question.id] ?? ""}
+                onChange={(event) => handleAnswer(question, event.target.value)}
+                placeholder="Enter a number..."
                 required={question.required !== false}
               />
             )}

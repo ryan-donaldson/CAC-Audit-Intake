@@ -3,10 +3,16 @@
 import { useEffect, useState } from "react";
 import { Question } from "../../utils/questions";
 import { useIntakeStore } from "../../stores/intakeStore";
+import {
+  buildAuditPayload,
+  formatAuditMessage,
+} from "../../utils/buildAuditPayload";
 
 export default function FinalQuestion({ question }: { question: Question }) {
   const answers = useIntakeStore((s) => s.answers);
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     import("canvas-confetti").then((confetti) => {
@@ -27,38 +33,59 @@ export default function FinalQuestion({ question }: { question: Question }) {
   }, []);
 
   async function sendAudit() {
-    const payload = {
-      answers,
-      timestamp: new Date().toISOString(),
-    };
+    setSending(true);
+    setError("");
 
-    console.log("Sending audit payload:", payload);
+    try {
+      const answersPayload = buildAuditPayload(answers);
+      const response = await fetch("/api/audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...answersPayload,
+          userMessage: formatAuditMessage(answersPayload),
+        }),
+      });
 
-    // Example: send to your future API route
-    await fetch("/api/audit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      setSent(true);
+    } catch (sendError) {
+      setError(
+        sendError instanceof Error
+          ? sendError.message
+          : "Unable to save responses. Please try again.",
+      );
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
     <div style={{ textAlign: "center", padding: "2rem" }}>
       <h2>🎉 Thank you!</h2>
       <p style={{ marginTop: "1rem" }}>
-        Your responses have been recorded. Click the button below to receive
-        your audit.
+        Click below to submit your responses.
       </p>
+      {error && (
+        <p role="alert" style={{ marginTop: "1rem" }}>
+          {error}
+        </p>
+      )}
 
       <button
         className="button"
         style={{ marginTop: "2rem" }}
-        onClick={() => {
-          sendAudit();
-          setSent(true);
-        }}
+        disabled={sending || sent}
+        onClick={sendAudit}
       >
-        {sent ? "Audit sent!" : "Send Audit"}
+        {sending
+          ? "Saving..."
+          : sent
+            ? "Responses saved!"
+            : "Save Responses"}
       </button>
     </div>
   );

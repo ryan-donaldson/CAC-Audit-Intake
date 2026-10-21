@@ -5,7 +5,7 @@ import TextQuestion from "../components/questions/TextQuestion";
 import SelectQuestion from "../components/questions/SelectQuestion";
 import FinalQuestion from "../components/questions/FinalQuestion";
 
-export type QuestionType = "text" | "yesno" | "select" | "final";
+export type QuestionType = "text" | "number" | "yesno" | "select" | "final";
 
 export type QuestionId = string;
 
@@ -21,6 +21,7 @@ export type Question = {
 };
 
 export type QuestionSection =
+  | "Business Basics"
   | "Business Context"
   | "Lead Capture & Intake"
   | "Customer Communication & Nurture"
@@ -36,6 +37,24 @@ export const questions: QuestionMap = {
   /* -------------------------------------------
    * SECTION 0 — BUSINESS CONTEXT (always asked)
    * ------------------------------------------- */
+  q0_business_name: {
+    id: "q0_business_name",
+    section: "Business Basics",
+    text: "What is your business name?",
+    type: "text",
+    required: true,
+    next: "q0_owner_first_name",
+  },
+
+  q0_owner_first_name: {
+    id: "q0_owner_first_name",
+    section: "Business Basics",
+    text: "What is the owner's first name?",
+    type: "text",
+    required: true,
+    next: "q0_1",
+  },
+
   q0_1: {
     id: "q0_1",
     section: "Business Context",
@@ -59,6 +78,51 @@ export const questions: QuestionMap = {
     section: "Business Context",
     text: "What's your biggest day-to-day time drain right now?",
     type: "text",
+    required: true,
+    next: "q0_4",
+  },
+
+  q0_4: {
+    id: "q0_4",
+    section: "Business Context",
+    text: "What would you consider to be your hourly rate?",
+    type: "text",
+    required: true,
+    next: "q0_5",
+  },
+
+  q0_5: {
+    id: "q0_5",
+    section: "Business Context",
+    text: "Who are your customers?",
+    type: "select",
+    options: ["Individual consumers", "Other businesses", "A mix of both"],
+    next: (answer) =>
+      answer === "Other businesses" || answer === "A mix of both"
+        ? "q0_6"
+        : "q0_7",
+  },
+
+  q0_6: {
+    id: "q0_6",
+    section: "Business Context",
+    text: "Once a deal closes, how are ongoing client relationships typically handled?",
+    type: "select",
+    options: [
+      "Dedicated account manager",
+      "Whoever originally worked the deal",
+      "No formal handoff",
+      "Other",
+    ],
+    next: "q0_7",
+  },
+
+  q0_7: {
+    id: "q0_7",
+    section: "Business Context",
+    text: "Roughly how many hours a week do you think this specific problem costs you?",
+    description: "An estimate is fine.",
+    type: "number",
     required: true,
     next: "q1_1",
   },
@@ -106,6 +170,15 @@ export const questions: QuestionMap = {
     text: "How long does it typically take you to respond to a new inquiry?",
     type: "select",
     options: ["Within minutes", "Same day", "1-2 days", "Longer"],
+    next: "q1_4",
+  },
+
+  q1_4: {
+    id: "q1_4",
+    section: "Lead Capture & Intake",
+    text: "Roughly how many new leads/inquiries do you get in a typical week?",
+    type: "number",
+    required: true,
     next: "q2_1",
   },
 
@@ -172,6 +245,15 @@ export const questions: QuestionMap = {
     text: "Do you send appointment reminders?",
     type: "select",
     options: ["No", "Manually", "Automated"],
+    next: "q3_4",
+  },
+
+  q3_4: {
+    id: "q3_4",
+    section: "Scheduling & Fulfillment",
+    text: "Roughly how many appointments/bookings do you handle in a typical week?",
+    type: "number",
+    required: true,
     next: "q4_1",
   },
 
@@ -254,16 +336,9 @@ export const questions: QuestionMap = {
   qC_1: {
     id: "qC_1",
     section: "Closing",
-    text: "Of the following areas, which is the one that, if fixed, you feel would make the biggest difference to your business?",
-    type: "select",
-    options: [
-      "Lead Capture & Intake",
-      "Customer Communication & Nurture",
-      "Scheduling and Fulfillment",
-      "Internal Ops & Team Communication",
-      "Content & Marketing",
-      "Data & Reporting",
-    ],
+    text: "Of everything above, what's the one thing that if fixed would make the biggest difference to your business?",
+    type: "text",
+    required: true,
     next: "qC_2",
   },
 
@@ -300,6 +375,7 @@ export const questions: QuestionMap = {
 export const questionComponents: Record<QuestionType, any> = {
   yesno: YesNoQuestion,
   text: TextQuestion,
+  number: TextQuestion,
   select: SelectQuestion,
   final: FinalQuestion,
 };
