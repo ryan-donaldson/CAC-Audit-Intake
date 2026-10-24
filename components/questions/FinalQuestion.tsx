@@ -56,7 +56,7 @@ export default function FinalQuestion({ question }: { question: Question }) {
       setError(
         sendError instanceof Error
           ? sendError.message
-          : "Unable to save responses. Please try again.",
+          : "Unable to send your audit. Please try again.",
       );
     } finally {
       setSending(false);
@@ -67,7 +67,7 @@ export default function FinalQuestion({ question }: { question: Question }) {
     <div style={{ textAlign: "center", padding: "2rem" }}>
       <h2>🎉 Thank you!</h2>
       <p style={{ marginTop: "1rem" }}>
-        Click below to submit your responses.
+        Click below to generate your PDF audit report and have it emailed to you.
       </p>
       {error && (
         <p role="alert" style={{ marginTop: "1rem" }}>
@@ -82,10 +82,10 @@ export default function FinalQuestion({ question }: { question: Question }) {
         onClick={sendAudit}
       >
         {sending
-          ? "Saving..."
+          ? "Sending..."
           : sent
-            ? "Responses saved!"
-            : "Save Responses"}
+            ? "Email sent!"
+            : "Send Audit"}
       </button>
     </div>
   );

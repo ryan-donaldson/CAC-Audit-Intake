@@ -19,8 +19,19 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Audit submissions
 
 When a user finishes the form, the responses are posted to `/api/audit`. The
-route does not yet persist anything; it will forward the data to the Railway
-endpoint that generates the PDF report.
+route sends the intake data to the Railway report service, waits for the
+generated PDF, and emails it to the address entered in the form using Resend.
+Configure these server-side environment variables before deployment:
+
+- `RAILWAY_URL`: the base URL of the Railway report service.
+- `RAILWAY_WEBHOOK_SECRET`: the secret sent in the `x-webhook-secret` header.
+- `RESEND_API_KEY`: the API key from the Resend account.
+- `RESEND_FROM_EMAIL`: a sender address verified with Resend.
+
+The Railway service must provide `POST /generate-report` and
+`GET /reports/{report_id}`. The generation endpoint returns a report ID; the
+report endpoint returns `application/pdf` once the PDF is ready. The sender
+address must be authorized by the configured Resend account.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
