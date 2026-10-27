@@ -33,6 +33,13 @@ The Railway service must provide `POST /generate-report` and
 report endpoint returns `application/pdf` once the PDF is ready. The sender
 address must be authorized by the configured Resend account.
 
+The generation request contains `client` and `intake` keys. `intake` is the
+complete form submission: answers are grouped under their section names and
+keyed by question text, with the pain point, budget, email, timestamp, and
+formatted `userMessage` at the top level. The form's internal question IDs are
+not sent. Vercel logs section answer counts and payload key names for
+diagnostics, but do not log answer values or email addresses.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

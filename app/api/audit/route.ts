@@ -9,6 +9,17 @@ const reportPollIntervalMs = 1_000;
 
 type JsonObject = Record<string, unknown>;
 
+const intakeSections = [
+  "Business Basics",
+  "Business Context",
+  "Lead Capture & Intake",
+  "Customer Communication & Nurture",
+  "Scheduling & Fulfillment",
+  "Internal Ops & Team Communication",
+  "Content & Marketing",
+  "Data & Reporting",
+] as const;
+
 function isJsonObject(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -35,6 +46,22 @@ function safeFilename(value: string): string {
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
   return `${name || "business"}-audit-report.pdf`;
+}
+
+function getIntakeDiagnostics(intake: JsonObject) {
+  return {
+    topLevelKeys: Object.keys(intake),
+    sectionAnswerCounts: Object.fromEntries(
+      intakeSections.map((section) => {
+        const answers = intake[section];
+        const count = isJsonObject(answers)
+          ? Object.values(answers).filter((answer) => getString(answer)).length
+          : 0;
+        return [section, count];
+      }),
+    ),
+    hasFormattedUserMessage: Boolean(getString(intake.userMessage)),
+  };
 }
 
 async function getGeneratedPdf(
@@ -157,6 +184,11 @@ export async function POST(req: Request) {
   };
 
   try {
+    console.info("Forwarding audit payload to Railway", {
+      forwardedKeys: ["client", "intake"],
+      intake: getIntakeDiagnostics(body),
+    });
+
     const generateResponse = await fetch(new URL("/generate-report", baseUrl), {
       method: "POST",
       headers: railwayHeaders,
