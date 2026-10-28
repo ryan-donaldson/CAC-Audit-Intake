@@ -112,10 +112,17 @@ export async function POST(req: Request) {
   const webhookSecret = process.env.RAILWAY_WEBHOOK_SECRET;
   const resendApiKey = process.env.RESEND_API_KEY;
   const resendFromEmail = process.env.RESEND_FROM_EMAIL;
+  const resendTemplateId = process.env.RESEND_TEMPLATE_ID;
 
-  if (!railwayUrl || !webhookSecret || !resendApiKey || !resendFromEmail) {
+  if (
+    !railwayUrl ||
+    !webhookSecret ||
+    !resendApiKey ||
+    !resendFromEmail ||
+    !resendTemplateId
+  ) {
     console.error(
-      "RAILWAY_URL, RAILWAY_WEBHOOK_SECRET, RESEND_API_KEY, and RESEND_FROM_EMAIL must be configured.",
+      "RAILWAY_URL, RAILWAY_WEBHOOK_SECRET, RESEND_API_KEY, RESEND_FROM_EMAIL, and RESEND_TEMPLATE_ID must be configured.",
     );
     return NextResponse.json(
       { error: "The audit report service is not configured." },
@@ -153,13 +160,19 @@ export async function POST(req: Request) {
   const businessName =
     isJsonObject(businessBasics) &&
     getString(businessBasics["What is your business name?"]);
+  const firstName =
+    isJsonObject(businessBasics) &&
+    getString(businessBasics["What is the owner's first name?"]);
   const industry =
     isJsonObject(businessContext) &&
     getString(businessContext["What does your business do?"]);
 
-  if (!businessName) {
+  if (!businessName || !firstName) {
     return NextResponse.json(
-      { error: "A business name is required to generate the audit report." },
+      {
+        error:
+          "A business name and owner's first name are required to generate the audit report.",
+      },
       { status: 400 },
     );
   }
@@ -253,8 +266,13 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         from: resendFromEmail,
         to: [recipient],
-        subject: "Your business automation audit report",
-        text: "Thank you for completing your business automation audit. Your PDF report is attached.",
+        template: {
+          id: resendTemplateId,
+          variables: {
+            first_name: firstName,
+            business_name: businessName,
+          },
+        },
         attachments: [
           {
             filename: safeFilename(businessName),

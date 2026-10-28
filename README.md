@@ -27,11 +27,18 @@ Configure these server-side environment variables before deployment:
 - `RAILWAY_WEBHOOK_SECRET`: the secret sent in the `x-webhook-secret` header.
 - `RESEND_API_KEY`: the API key from the Resend account.
 - `RESEND_FROM_EMAIL`: a sender address verified with Resend.
+- `RESEND_TEMPLATE_ID`: the ID of the Resend email template to use.
 
 The Railway service must provide `POST /generate-report` and
 `GET /reports/{report_id}`. The generation endpoint returns a report ID; the
 report endpoint returns `application/pdf` once the PDF is ready. The sender
-address must be authorized by the configured Resend account.
+address must be authorized by the configured Resend account. The Resend
+template must define `{{first_name}}` and `{{business_name}}` variables; these
+names are case-sensitive and must match the variables sent by the route.
+Because the email request is made by this Next.js application, configure
+`RESEND_TEMPLATE_ID` in the environment where the Next.js server runs (for
+example, its Vercel/Railway project variables), not only in the separate
+Railway report service.
 
 The generation request contains `client` and `intake` keys. `intake` is the
 complete form submission: answers are grouped under their section names and
