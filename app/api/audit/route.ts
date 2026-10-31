@@ -300,7 +300,7 @@ covenantaico.com`,
 <p>Thank you for completing the AI Audit intake-form. Your answers have been analyzed to create a personalized AI roadmap for your business, prioritized by impact and effort. The goal is to not only save time but also <strong>increase revenue.</strong></p>
 <p>Questions? Just reply to this email. I look forward to hearing from you!</p>
 <p>Sincerely,</p>
-<p><strong style="color: #888;">Nathan Donaldson</strong><br>
+<p><strong style="color: black;">Nathan Donaldson</strong><br>
 Founder &amp; AI Consultant<br>
 <img src="cid:covenant-ai-logo" alt="Covenant AI Consulting — Ancient promises, modern results." width="360" style="display: block; width: 360px; max-width: 100%; height: auto; margin: 8px 0;"><br>
 <a href="mailto:nathan@covenantaico.com">nathan@covenantaico.com</a><br>
