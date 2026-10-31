@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -26,6 +28,19 @@ function isJsonObject(value: unknown): value is JsonObject {
 
 function getString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[character];
+  });
 }
 
 function getReportId(value: unknown): string | undefined {
@@ -112,17 +127,15 @@ export async function POST(req: Request) {
   const webhookSecret = process.env.RAILWAY_WEBHOOK_SECRET;
   const resendApiKey = process.env.RESEND_API_KEY;
   const resendFromEmail = process.env.RESEND_FROM_EMAIL;
-  const resendTemplateId = process.env.RESEND_TEMPLATE_ID;
 
   if (
     !railwayUrl ||
     !webhookSecret ||
     !resendApiKey ||
-    !resendFromEmail ||
-    !resendTemplateId
+    !resendFromEmail
   ) {
     console.error(
-      "RAILWAY_URL, RAILWAY_WEBHOOK_SECRET, RESEND_API_KEY, RESEND_FROM_EMAIL, and RESEND_TEMPLATE_ID must be configured.",
+      "RAILWAY_URL, RAILWAY_WEBHOOK_SECRET, RESEND_API_KEY, and RESEND_FROM_EMAIL must be configured.",
     );
     return NextResponse.json(
       { error: "The audit report service is not configured." },
@@ -257,6 +270,10 @@ export async function POST(req: Request) {
       );
     }
 
+    const logo = await readFile(
+      join(process.cwd(), "public", "covenant-ai-logo.png"),
+    );
+
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -266,17 +283,37 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         from: resendFromEmail,
         to: [recipient],
-        template: {
-          id: resendTemplateId,
-          variables: {
-            first_name: firstName,
-            business_name: businessName,
-          },
-        },
+        subject: "Your AI Audit Report is Ready",
+        text: `Hello ${firstName},
+
+Thank you for completing the AI Audit intake-form. Your answers have been analyzed to create a personalized AI roadmap for your business, prioritized by impact and effort. The goal is to not only save time but also increase revenue.
+
+Questions? Just reply to this email. I look forward to hearing from you!
+
+Sincerely,
+
+Nathan Donaldson
+Founder & AI Consultant
+nathan@covenantaico.com
+covenantaico.com`,
+        html: `<p>Hello ${escapeHtml(firstName)},</p>
+<p>Thank you for completing the AI Audit intake-form. Your answers have been analyzed to create a personalized AI roadmap for your business, prioritized by impact and effort. The goal is to not only save time but also <strong>increase revenue.</strong></p>
+<p>Questions? Just reply to this email. I look forward to hearing from you!</p>
+<p>Sincerely,</p>
+<p><strong style="color: #888;">Nathan Donaldson</strong><br>
+Founder &amp; AI Consultant<br>
+<img src="cid:covenant-ai-logo" alt="Covenant AI Consulting — Ancient promises, modern results." width="360" style="display: block; width: 360px; max-width: 100%; height: auto; margin: 8px 0;"><br>
+<a href="mailto:nathan@covenantaico.com">nathan@covenantaico.com</a><br>
+<a href="https://covenantaico.com">covenantaico.com</a></p>`,
         attachments: [
           {
             filename: safeFilename(businessName),
             content: pdf.toString("base64"),
+          },
+          {
+            filename: "covenant-ai-logo.png",
+            content: logo.toString("base64"),
+            content_id: "covenant-ai-logo",
           },
         ],
       }),
